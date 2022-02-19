@@ -52,7 +52,7 @@ class BaseVAE(LightningModule):
 		self.log_dict({f"{prefix}_{key}": val.item() for key, val in eval_loss.items()}, sync_dist=True)
 
 	def configure_optimizers(self):
-		return torch.optim.Adam(self.parameters(), lr=2e-5, betas=(0.5, 0.999))
+		return torch.optim.Adam(self.parameters(), lr=5e-3, betas=(0.5, 0.999))
 
 
 
