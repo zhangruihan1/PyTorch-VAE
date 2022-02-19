@@ -1,6 +1,9 @@
+import torch
 from .types_ import *
 from torch import nn
 from abc import abstractmethod
+from pytorch_lightning.core.lightning import LightningModule
+
 
 class BaseVAE(nn.Module):
     
@@ -26,6 +29,28 @@ class BaseVAE(nn.Module):
     @abstractmethod
     def loss_function(self, *inputs: Any, **kwargs) -> Tensor:
         pass
+    
+   def training_step(self, batch, batch_idx):
+        results = self(batch['images'])
+        train_loss = self.loss_function(*results, M_N = 0.005)
+
+        self.log_dict({key: val.item() for key, val in train_loss.items()}, sync_dist=True)
+
+        return train_loss['loss']
+
+    def validation_step(self, batch, batch_idx):
+        self._shared_eval(batch, batch_idx, "val")
+
+    def _shared_eval(self, batch, batch_idx, prefix):
+        with torch.no_grad():
+            results = self(batch['A'])
+            eval_loss = self.loss_function(*results, M_N = 0.005)
+        
+        self.log_dict({f"{prefix}_{key}": val.item() for key, val in eval_loss.items()}, sync_dist=True)
+        
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=2e-5, betas=(0.5, 0.999))
+
 
 
 
