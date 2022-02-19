@@ -5,7 +5,7 @@ from abc import abstractmethod
 from pytorch_lightning.core.lightning import LightningModule
 
 
-class BaseVAE(nn.Module):
+class BaseVAE(LightningModule):
     
 	def __init__(self) -> None:
 		super(BaseVAE, self).__init__()
