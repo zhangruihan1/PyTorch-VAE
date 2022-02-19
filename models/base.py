@@ -40,6 +40,9 @@ class BaseVAE(LightningModule):
 
 	def validation_step(self, batch, batch_idx):
 		self._shared_eval(batch, batch_idx, "val")
+		
+	def test_step(self, batch, batch_idx):
+		self._shared_eval(batch, batch_idx, "test")
 
 	def _shared_eval(self, batch, batch_idx, prefix):
 		with torch.no_grad():
